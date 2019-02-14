@@ -7,8 +7,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/compute/:req_id', (req, res) => {
-  console.log(req.body);
-  res.send({message: 'Ok, good request'});
+  const minuend = getMinuend(req.body);
+  const subtrahend = getSubtrahend(req.body);
+
+  const diff = minuend.values.map( (e, i) => {
+    return e - subtrahend.values[i];
+  });
+
+  res.send({
+    request_id: req.params.req_id,
+    timestamp: req.body.timestamp,
+    result: {
+      title: "Result",
+      values: diff
+    }
+  });
 });
 
 app.use('*', (req, res, next) => {
@@ -18,3 +31,11 @@ app.use('*', (req, res, next) => {
 app.listen(port, () => {
   console.log(`Test app listening on port ${port}!`)
 });
+
+function getMinuend(obj) {
+  return obj.data.find( e => e.title === 'Part 1' );
+}
+
+function getSubtrahend(obj) {
+  return obj.data.find( e => e.title === 'Part 2' );
+}
